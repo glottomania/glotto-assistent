@@ -223,19 +223,28 @@ if ($team.lagring -eq 'dropbox') {
 
 # --- 8. Snabbåtkomst i Utforskaren ----------------------------------------------
 # Fäst projektmappen och teammappen, så att de alltid ligger ett klick bort.
+# Allt teamets ska börja med teamets namn, så att det grupperas i bokstavsordning.
+# Heter teammappen inte så, fästs mappen den ligger i om den gör det (till exempel
+# "Glotto Dropbox" i stället för "Teammapp för Glotto").
+$fastTeam = $teammapp
+$foralder = Split-Path $teammapp -Parent
+if (-not (Split-Path $teammapp -Leaf).StartsWith($team.namn, [StringComparison]::OrdinalIgnoreCase) -and
+    (Split-Path $foralder -Leaf).StartsWith($team.namn, [StringComparison]::OrdinalIgnoreCase)) {
+    $fastTeam = $foralder
+}
 try {
     $shell = New-Object -ComObject Shell.Application
     $fasta = @($shell.Namespace('shell:::{679f85cb-0220-4080-b29b-5540cc05aab6}').Items() |
         Where-Object { $_.ExtendedProperty('System.Home.IsPinned') -ne $false } | ForEach-Object { $_.Path })
     $nya = @()
-    foreach ($m in @($projektmapp, $teammapp)) {
+    foreach ($m in @($projektmapp, $fastTeam)) {
         if ($fasta -notcontains $m) {
             $shell.Namespace($m).Self.InvokeVerb('pintohome')
             $nya += Split-Path $m -Leaf
         }
     }
     if ($nya.Count) { Rad 'OK' 'Snabbåtkomst' ('fäst: ' + ($nya -join ', ')) }
-    else { Rad 'OK' 'Snabbåtkomst' 'projektmappen och teammappen är redan fästa' }
+    else { Rad 'OK' 'Snabbåtkomst' ('redan fästa: {0}, {1}' -f (Split-Path $projektmapp -Leaf), (Split-Path $fastTeam -Leaf)) }
 } catch {
     Rad 'Senare' 'Snabbåtkomst' 'kunde inte fästa mapparna - högerklicka på dem i Utforskaren och välj Fäst i Snabbåtkomst'
 }

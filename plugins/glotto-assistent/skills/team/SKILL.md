@@ -75,7 +75,7 @@ Bekräfta först: *"Ta bort Johan: han slutar se teammappen och gruppen. Hans na
 För den som ska starta ett eget team - hos en kund, eller ett nytt internt.
 
 1. **Uppgifter:** teamets namn, tidszon (föreslå användarens), lagring, Google-grupp om teamet använder Google, och vem som är admin (användaren).
-2. **Teammappen:** användaren skapar en tom mapp i sin Dropbox - döp den till exempel `Teammapp för <namn>` - och du begär åtkomst till den. Skapa `wiki/`, `indata/`, `arkiv/`, `journal/`.
+2. **Teammappen:** användaren skapar en tom mapp i sin Dropbox som heter `<namn> Teammapp`, och du begär åtkomst till den. Allt som hör till teamet börjar med teamets namn - `<namn> Assistant`, `<namn> Teammapp` - så att det hamnar samlat i bokstavsordning i Utforskaren. Skapa `wiki/`, `indata/`, `arkiv/`, `journal/`.
 3. **Teamfilen:** skriv den med `spara_team()`, med användaren som enda medlem och admin. Skriv den installerade pluginversionen till `.glotto-version`.
 4. **Användarens egen installation:** användaren kör installationsskriptet (se *Installation* i `GLOTTO.md`). Det hittar den nya teammappen och skapar projektmappen `<namn> Assistant`.
 5. **Google-gruppen**, om teamet använder Google - ge stegen, de görs en gång:

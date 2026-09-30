@@ -1,0 +1,5 @@
+*.plugin
+desktop.ini
+# Administratörens egna filer - laddas aldrig upp
+STATUS.md
+ADMIN.md

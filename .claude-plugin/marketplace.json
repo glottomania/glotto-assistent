@@ -1,0 +1,12 @@
+{
+  "name": "glottomania",
+  "owner": { "name": "Glotto" },
+  "description": "Glottos plugin-katalog.",
+  "plugins": [
+    {
+      "name": "glotto-assistent",
+      "source": "./plugins/glotto-assistent",
+      "description": "Kunskapssystem för team enligt indata/wiki/utdata-modellen, med delad wiki i Dropbox."
+    }
+  ]
+}

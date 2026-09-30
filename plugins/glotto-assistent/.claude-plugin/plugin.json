@@ -1,0 +1,14 @@
+{
+  "name": "glotto-assistent",
+  "version": "0.21.1",
+  "description": "Kunskapssystem för team enligt indata/wiki/utdata-modellen, med delad wiki i Dropbox.",
+  "author": {
+    "name": "Glotto"
+  },
+  "keywords": [
+    "wiki",
+    "kunskapshantering",
+    "dropbox",
+    "svenska"
+  ]
+}

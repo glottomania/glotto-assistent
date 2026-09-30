@@ -23,55 +23,28 @@ Ordnas av teamets administratör, en gång.
 
 ## Installera
 
-Varje användare gör detta en gång.
+Varje ny användare gör detta en gång, efter att administratören lagt till hen
+(se *Ny medlem* nedan).
 
-0. **Virtualisering påslagen.** Claude behöver den för att arbeta i dina mappar.
-   Tryck på Windows-tangenten, skriv `powershell`, tryck Enter och klistra in:
+1. **Acceptera inbjudan till teammappen** och vänta tills den synkat till datorn.
+2. **Kör installationsskriptet.** Tryck på Windows-tangenten, skriv `powershell`,
+   tryck Enter och klistra in:
 
    ```
-   (Get-CimInstance Win32_ComputerSystem).HypervisorPresent
+   irm https://raw.githubusercontent.com/glottomania/glotto-assistent/main/installation/installera.ps1 | iex
    ```
 
-   Svaret ska vara `True`. Är det `False`: tryck på Windows-tangenten, skriv
-   `optionalfeatures`, bocka för **Plattform för virtuella datorer**, klicka OK och
-   starta om datorn.
-1. **Lägg till katalogen och installera.** I Claude-appen:
+   Skriptet slår på virtualisering om den saknas, hittar teammappen, låter dig
+   välja dig själv bland medlemmarna, skapar din projektmapp med Handboken och
+   ställer in Dropbox. Det slutar med en lista med OK och Fel och säger vad som
+   återstår. Det kan köras om hur många gånger som helst.
+3. **Installera pluginet** i Claude-appen:
    1. Öppna **Customize** i menyn till vänster och välj fliken **Plugins**.
-   2. Klicka **+ Add** uppe till höger och välj att lägga till från ett repo
-      (*Add from a repository*).
+   2. Klicka **+ Add** uppe till höger och välj *Add from a repository*.
    3. Skriv `glottomania/glotto-assistent` och bekräfta.
-   4. Katalogen dyker upp. Klicka på **Glotto assistent** i den och välj **Install**.
-   5. Klart när Glotto assistent syns under *From marketplaces you added*.
-2. **Har du en äldre version sedan tidigare, ta bort den först** - se *Ta bort en
-   gammal version* nedan.
-3. **Projektmappen.** Skapa en mapp i din hemkatalog, till exempel
-   `Glotto Assistant`, med undermapparna `verkstad` och `utdata`, och anslut den i
-   Claude. Första gången du säger till exempel *"visa status"* frågar Claude efter
-   ditt användarnamn och sökvägen till teammappen och skapar konfigurationen själv.
-4. **Teammappen** ska vara delad med dig och synkad till din dator. Claude ber om
-   åtkomst till den första gången den behövs.
-5. **Google**, om teamet använder det: koppla Google Drive i Claude med ditt
-   jobbkonto.
-6. **Obsidian.** Öppna teammappen och projektmappen som två separata valv.
-7. **Dropbox ska inte synka Obsidians fönsterläge.** Filen `workspace.json` i
-   teammappens `.obsidian` sparar vilka flikar du har öppna. Delas den skriver
-   ni över varandras fönster och Dropbox skapar konfliktkopior. Gör så här, en
-   gång per dator:
-   1. Öppna teammappen i Obsidian en gång, så att filen finns. Stäng Obsidian.
-   2. Tryck på Windows-tangenten, skriv `powershell` och tryck Enter.
-   3. Klistra in raden nedan, med sökvägen ändrad till din teammapp, och tryck
-      Enter. Inget svar betyder att det gick bra.
-
-      ```
-      Set-Content -Path "$HOME\Dropbox\Teammapp\.obsidian\workspace.json" -Stream com.dropbox.ignored -Value 1
-      ```
-
-   4. Kontrollera i Utforskaren: filen `workspace.json` ska ha en grå ikon med
-      ett minustecken i stället för en grön bock. Det betyder att Dropbox
-      ignorerar den.
-
-   Obs: filen försvinner då från Dropbox hos de andra. Deras Obsidian skapar en
-   ny nästa gång de öppnar valvet - de måste då köra samma rad hos sig.
+   4. Klicka på **Glotto assistent** i katalogen och välj **Install**.
+4. **Starta en ny uppgift**, anslut projektmappen och säg *"visa status"*.
+   Claudes startkoll säger till om något saknas.
 
 ## Var pluginet finns
 
@@ -95,12 +68,15 @@ skrivande funktioner stannar tills du uppdaterat.
 
 ## Ny medlem i teamet
 
-Administratören:
-1. Delar teammappen med personen.
-2. Lägger till personen i teamets grupp i Google Workspace, om teamet använder
-   det. De delade enheterna syns då hos personen inom någon minut.
+Teamets administratör säger till Claude: *"lägg till Anna i teamet"*. Claude
+lägger in henne i teamfilen, delar teammappen, lägger till henne i teamets
+Google-grupp och skriver ett välkomstmejl med instruktionen ovan.
 
-Personen följer sedan *Installera* ovan.
+## Nytt team
+
+*"Sätt upp ett nytt team"* skapar teammappens struktur och teamfilen,
+`.glotto/team.json`. Allt som hör till ett team - namn, medlemmar, tidszon,
+grupp - står där. Pluginet och skriptet är likadana för alla team.
 
 ## För den som bygger
 

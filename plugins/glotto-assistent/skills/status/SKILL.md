@@ -7,7 +7,7 @@ description: Visar läget i teamets kunskapssystem och listar wikins dokument nu
 
 Läs `${CLAUDE_PLUGIN_ROOT}/GLOTTO.md` först - konfiguration, frontmatter-hantering och regler. Läs frontmatter med `las()` därifrån, aldrig med `grep`.
 
-**Versionskontrollen först** - se avsnittet *Versionskontroll* i `GLOTTO.md`. Vid `gammal`: ge beskedet och fortsätt.
+**Startkollen först** - se avsnitten *Startkoll* och *Versionskontroll* i `GLOTTO.md`. Vid versionen `gammal`: ge beskedet och fortsätt.
 
 Läsoperation - ändra ingenting (utöver att versionskontrollen kan flytta fram teamets version).
 

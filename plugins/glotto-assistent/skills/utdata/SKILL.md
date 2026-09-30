@@ -7,7 +7,7 @@ description: Skapar färdigt, designat material ur ett eller flera wikidokument 
 
 Läs `${CLAUDE_PLUGIN_ROOT}/GLOTTO.md` först - konfiguration, frontmatter-hantering och regler. Läs frontmatter med `las()` därifrån, aldrig med `grep`.
 
-**Versionskontrollen först** - se avsnittet *Versionskontroll* i `GLOTTO.md`. Vid `gammal`: stanna.
+**Startkollen först** - se avsnitten *Startkoll* och *Versionskontroll* i `GLOTTO.md`. Vid versionen `gammal`: stanna.
 
 Detta är operation 3, och den enklaste: **wikidokumentet ändras aldrig.** Ingen utcheckning behövs, inget lås, ingen risk för kollision. Checka aldrig ut ett dokument för att producera utdata ur det.
 

@@ -7,7 +7,7 @@ description: Tar fram ett nytt kunskapsdokument till wikin genom att först sök
 
 Läs `${CLAUDE_PLUGIN_ROOT}/GLOTTO.md` först - konfiguration, frontmatter-hantering och regler. Läs frontmatter med `las()`, aldrig med `grep`.
 
-**Versionskontrollen först** - se avsnittet *Versionskontroll* i `GLOTTO.md`. Vid `gammal`: stanna.
+**Startkollen först** - se avsnitten *Startkoll* och *Versionskontroll* i `GLOTTO.md`. Vid versionen `gammal`: stanna.
 
 Resultatet är **ett** dokument i verkstaden. Inte två, inte ett med bilagor.
 

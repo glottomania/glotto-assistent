@@ -7,7 +7,7 @@ description: Visar teamrapporten - en tabell per användare med allt hen har rö
 
 Läs `${CLAUDE_PLUGIN_ROOT}/GLOTTO.md` först - konfiguration, frontmatter, journalens handlingsord och hjälpfunktionerna `las()`, `nu()`, `montering()`. Läs frontmatter med `las()`, aldrig med `grep`.
 
-**Versionskontrollen först** - se avsnittet *Versionskontroll* i `GLOTTO.md`. Vid `gammal`: ge beskedet, visa den befintliga rapporten om det finns en, men ta inte fram en ny.
+**Startkollen först** - se avsnitten *Startkoll* och *Versionskontroll* i `GLOTTO.md`. Vid versionen `gammal`: ge beskedet, visa den befintliga rapporten om det finns en, men ta inte fram en ny.
 
 Rapporten är **en gemensam fil**, `journal/rapport.md` i teammappen. Den är likadan för alla och har ingen privat del. Den skrivs över varje gång den tas fram - historiken finns i journalen, och Dropbox har versionshistorik.
 

@@ -32,11 +32,51 @@ få namnet under `$HOME/mnt/`; skicka det, inte `delad_mapp`, till funktionerna
 som tar en mapp. Punktmappen är avsiktlig - konfiguration hör inte
 hemma bland användarens filer, och Obsidian indexerar aldrig punktmappar.
 
-Saknas filen, fråga användaren efter namn och delad mapp och skapa den.
+Filen skapas normalt av installationsskriptet (se *Installation* nedan). Saknas
+den, fråga användaren vem hen är - bland medlemmarna i teamfilen, om den går att
+läsa - och var teammappen ligger, och skapa den.
 **Bara `.glotto/config.json` räknas.** En fil med annat namn - `.glotto_old/config.json`,
 en kopia, en backup - är inte konfigurationen och används aldrig, inte ens som
 förslag. Fråga i stället.
 Hårdkoda aldrig sökvägar eller användarnamn - de skiljer sig mellan klienter.
+
+## Teamfilen
+
+Allt som skiljer ett team från ett annat står i **teamfilen**,
+`.glotto/team.json` i teammappen. Pluginet är likadant för alla team och vet
+ingenting om något av dem; det läser teamfilen.
+
+```json
+{
+  "namn": "Exempel",
+  "tidszon": "Europe/Stockholm",
+  "lagring": "dropbox",
+  "delad_mapp_namn": "Teammapp",
+  "google_grupp": "team@exempel.se",
+  "admin": ["anna"],
+  "medlemmar": [
+    {"anvandare": "anna", "namn": "Anna Svensson", "epost": "anna@exempel.se", "kallas": ["Ana"]},
+    {"anvandare": "johan", "namn": "Johan Berg", "epost": "johan@exempel.se", "kallas": ["Jojje", "Johann"]}
+  ]
+}
+```
+
+- `namn` - teamets namn. Projektmappen heter `<namn> Assistant`.
+- `tidszon` - tiden i journal och frontmatter räknas i den.
+- `lagring` - vad som synkar teammappen: `dropbox` (provat) eller annat.
+- `delad_mapp_namn` - teammappens eget namn, sista ledet i `delad_mapp`.
+- `google_grupp` - gruppen som ger åtkomst till företagets delade enheter. Tom om teamet inte använder Google.
+- `admin` - vilka som får lägga till och ta bort medlemmar.
+- `medlemmar` - alla i teamet. `anvandare` är det som skrivs i filer; `kallas`
+  är andra namn personen går under i samtal. `aktiv: false` betyder att
+  personen lämnat teamet - raden står kvar, eftersom journalen och wikin
+  fortfarande nämner hen.
+
+**Teamfilen ändras bara med skillen `team`.** Den är teamets register, och ett
+handgjort fel i den - en dubblett, en felstavning - syns i allt annat.
+
+Läs den med `team()` från hjälpfunktionerna. Tidszonen hämtas därifrån
+automatiskt av `nu()`.
 
 ## Den delade mappen ansluter sig själv
 
@@ -116,9 +156,9 @@ Säger användaren *Jojje*, *Johann* eller *Ana*, förstå vem som avses och
 skriv användarnamnet - `johan`, `anna`. Det är inte användarnas sak att
 stava rätt; det är din att översätta.
 
-Användarnamnen är de som står i journalens filnamn (`2026-09-johan.md`) och i
-`anvandare` i konfigurationen. Stämmer ett namn inte entydigt med ett av dem,
-fråga innan du skriver. Skälet: fälten jämförs rakt av - `tilldelad: johann`
+Användarnamnen står i teamfilen, med namn och smeknamn (`kallas`) - använd
+`vem(namn)` för att slå upp ett namn som sagts i samtal. Stämmer det inte
+entydigt med en medlem, fråga innan du skriver. Skälet: fälten jämförs rakt av - `tilldelad: johann`
 syns aldrig för den som heter `johan`.
 
 **`utplockad_av` är enda sanningen om låset.** Står det ett namn är dokumentet
@@ -308,11 +348,39 @@ def skriv(sokvag, meta, brodtext):
     io.open(sokvag, "w", encoding="utf-8").write(
         FENA + (chr(10)).join(rader) + chr(10) + FENA + brodtext)
 
-TIDSZON = "Europe/Stockholm"    # datorn skripten kor pa gar i UTC - tiden ska vara anvandarens
+MNT = os.path.expanduser("~/mnt")
+
+def team(teammapp=None):
+    """Teamfilen som dict, eller None. Utan argument letas den upp bland de anslutna mapparna."""
+    import json, glob
+    kandidater = ([os.path.join(MNT, teammapp, ".glotto", "team.json")] if teammapp
+                  else sorted(glob.glob(os.path.join(MNT, "*", ".glotto", "team.json"))))
+    for fil in kandidater:
+        if os.path.exists(fil):
+            return json.load(io.open(fil, encoding="utf-8-sig"))
+    return None
+
+def vem(namn, t=None):
+    """Anvandarnamnet for ett namn som sagts i samtal - anvandarnamn, fullt namn,
+    fornamn eller smeknamn. Returnerar (anvandare, None) eller (None, [kandidater])."""
+    t = t or team() or {}
+    n = namn.strip().lower()
+    traff = []
+    for m in t.get("medlemmar", []):
+        alias = [m.get("anvandare", ""), m.get("namn", "")] + (m.get("namn", "").split()[:1]) + m.get("kallas", [])
+        if n in [a.strip().lower() for a in alias if a]:
+            traff.append(m["anvandare"])
+    traff = sorted(set(traff))
+    return (traff[0], None) if len(traff) == 1 else (None, traff)
+
+def tidszon():
+    t = team()
+    return (t or {}).get("tidszon") or "Europe/Stockholm"
 
 def nu():
+    """Nuvarande tid i teamets tidszon. Datorn skripten kor pa gar i UTC."""
     import zoneinfo
-    return datetime.datetime.now(zoneinfo.ZoneInfo(TIDSZON)).strftime("%Y-%m-%dT%H:%M")
+    return datetime.datetime.now(zoneinfo.ZoneInfo(tidszon())).strftime("%Y-%m-%dT%H:%M")
 
 def ledigt(meta):
     return not (meta.get("utplockad_av") or "").strip()
@@ -373,16 +441,74 @@ def journalfor(delad_mapp, anvandare, handling, dokument="", detalj=""):
             f.write("# Journal %s %s" % (anvandare, tid[:7]) + chr(10) + chr(10))
         f.write("- " + " | ".join([tid, ren(handling), ren(dokument), ren(detalj)]) + chr(10))
 
+def spara_team(teammapp, t):
+    """Skriver teamfilen efter kontroll. Anvands bara av skillen team."""
+    import json, re
+    namn = [m.get("anvandare", "") for m in t.get("medlemmar", [])]
+    for a in namn:
+        if not re.fullmatch(r"[a-z0-9-]+", a):
+            raise ValueError("ogiltigt anvandarnamn: %r" % a)
+    if len(set(namn)) != len(namn):
+        raise ValueError("dubblett bland anvandarnamnen")
+    for a in t.get("admin", []):
+        if a not in namn:
+            raise ValueError("admin %r ar inte medlem" % a)
+    mapp = os.path.join(MNT, teammapp, ".glotto")
+    os.makedirs(mapp, exist_ok=True)
+    tmp = os.path.join(mapp, "team.json.tmp")
+    io.open(tmp, "w", encoding="utf-8").write(json.dumps(t, ensure_ascii=False, indent=2) + chr(10))
+    os.replace(tmp, os.path.join(mapp, "team.json"))
+
+def startkoll(installerad):
+    """Kontrollerar det Claude-sidan kan se. Returnerar en dict; 'fel' ar tom nar allt ar i ordning."""
+    import json, glob
+    r = {"fel": []}
+    cfg = sorted(glob.glob(os.path.join(MNT, "*", ".glotto", "config.json")))
+    if not cfg:
+        r["fel"].append("projektmapp: ingen ansluten mapp har .glotto/config.json")
+        return r
+    if len(cfg) > 1:
+        r["fel"].append("flera projektmappar anslutna: " + ", ".join(c.split(os.sep)[-3] for c in cfg))
+        return r
+    c = json.load(io.open(cfg[0], encoding="utf-8-sig"))
+    projekt = os.path.dirname(os.path.dirname(cfg[0]))
+    r["projektmapp"] = os.path.basename(projekt)
+    r["anvandare"] = c.get("anvandare")
+    r["delad_mapp"] = c.get("delad_mapp")
+    for u in ("verkstad", "utdata"):
+        if not os.path.isdir(os.path.join(projekt, u)):
+            r["fel"].append("projektmapp: %s/ saknas" % u)
+    if not r["anvandare"] or not r["delad_mapp"]:
+        r["fel"].append("konfiguration: anvandare eller delad_mapp saknas")
+        return r
+    tm = montering(r["delad_mapp"])
+    if not os.path.isdir(os.path.join(MNT, tm)):
+        r["teammapp"] = "ej ansluten"
+        return r
+    r["teammapp"] = "ok"
+    t = team(tm)
+    if t is None:
+        r["fel"].append("teamfil: .glotto/team.json saknas i teammappen")
+        return r
+    r["team"] = t.get("namn")
+    aktiva = [m["anvandare"] for m in t.get("medlemmar", []) if m.get("aktiv", True)]
+    if r["anvandare"] not in aktiva:
+        r["fel"].append("medlem: %s star inte bland teamets medlemmar" % r["anvandare"])
+    r["admin"] = r["anvandare"] in t.get("admin", []) and r["anvandare"] in aktiva
+    r["version"], r["teamets_version"] = versionskontroll(r["delad_mapp"], installerad)
+    return r
+
 ```
 
 `las()` tål `---` i brödtexten, tomma fält, och fält i valfri ordning.
 `skriv()` återställer standardordningen och bevarar fält som någon lagt till
 utanför standarden. `till_lankar()` och `till_text()` konverterar `underlag`
 mellan wikins och verkstadens form. `journalfor()` skriver en journalrad - se
-avsnittet *Journal*.
+avsnittet *Journal*. `team()`, `vem()` och `spara_team()` läser teamfilen, slår
+upp namn och skriver teamfilen. `startkoll()` - se avsnittet *Startkoll*.
 
 Hämta tiden med `nu()`, aldrig ur minnet eller med `date` - datorn där skripten
-körs går i UTC, och `nu()` räknar om till svensk tid.
+körs går i UTC, och `nu()` räknar om till teamets tidszon.
 
 ## Innan du skriver över en fil
 
@@ -393,16 +519,64 @@ längd jämfört med källan, och att de fält du satte har de värden du avsåg
 Går något av detta inte att bekräfta - lämna källan orörd och säg till
 användaren var båda kopiorna finns.
 
-## Versionskontroll
+## Startkoll
 
-Alla i teamet ska köra samma version av pluginet. Filen `.glotto-version` i
-teammappen anger vilken version teamet kör.
-
-**Varje skill börjar med kontrollen**, innan något annat görs:
+**Varje skill börjar med startkollen**, innan något annat görs. Den ska göra att
+användaren får veta vad som saknas *innan* hen sätter igång, i stället för mitt
+i arbetet.
 
 1. Läs den installerade versionen ur `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`
    (fältet `version`). Filen ligger där skillen läses, inte på användarens dator.
-2. Anropa `versionskontroll(delad_mapp, installerad)` i `device_bash`.
+2. Anropa `startkoll(installerad)` i `device_bash`. Går `device_bash` inte att
+   anropa alls saknas skalet mot datorn - se tabellen.
+3. Är `teammapp` = `ej ansluten`: begär åtkomst enligt *Den delade mappen ansluter
+   sig själv* och kör startkollen igen.
+4. Titta själv efter det Claude-sidan har: finns Google Drive-verktygen?
+
+**Första gången i en konversation**, ge en rad även när allt är i ordning:
+
+> Startkoll: dator ok · Glotto Assistant · teammapp ok · du: anna · version 0.22.0 · Drive ok
+
+Därefter i samma konversation: säg bara något om något ändrats eller är fel.
+
+| Fel | Säg |
+|---|---|
+| `device_bash` saknas | Skalet mot datorn saknas, oftast för att virtualisering är avstängd. Kör installationsskriptet igen - det kontrollerar och slår på den. |
+| ingen projektmapp | Anslut projektmappen (`<team> Assistant`) i Claude-appen. Finns den inte: kör installationsskriptet. |
+| flera projektmappar | Du har flera teams projektmappar anslutna. Vilket team gäller? Koppla bort de andra för den här chatten. |
+| `verkstad/` eller `utdata/` saknas | Kör installationsskriptet igen - det skapar dem. |
+| teamfil saknas | Teamet är inte uppsatt. En admin säger *"sätt upp teamet"* (skillen `team`). |
+| inte medlem | Du står inte i teamfilen. Be en admin säga *"lägg till <namn> i teamet"*. |
+| Drive saknas | Inget stopp. Koppla Google Drive under Connectors om teamet använder det - annars söks bara wikin, indata och webben. |
+
+Skills som bara läser fortsätter efter beskedet om det går. Skills som skriver
+stannar vid fel i projektmapp, teamfil eller medlemskap.
+
+## Installation
+
+Windows-sidan ordnas av **installationsskriptet** i repot,
+`installation/installera.ps1`. Användaren klistrar in en rad i PowerShell:
+
+```
+irm https://raw.githubusercontent.com/glottomania/glotto-assistent/main/installation/installera.ps1 | iex
+```
+
+Skriptet slår på virtualisering vid behov, hittar teamfilen i den synkade
+teammappen, låter användaren välja sig själv bland medlemmarna, skapar
+projektmappen med `verkstad/`, `utdata/` och `.glotto/config.json`, lägger
+Handboken i projektmappen och ser till att Dropbox inte synkar Obsidians
+fönsterläge. Det slutar med en lista med OK och Fel. Det kan köras om hur många
+gånger som helst - det skriver aldrig över en befintlig konfiguration.
+
+Startkollen och skriptet delar på arbetet: skriptet ser Windows-sidan, startkollen
+det Claude ser. Hör ett fel till Windows-sidan, hänvisa till skriptet i stället
+för att förklara stegen själv.
+
+## Versionskontroll
+
+Alla i teamet ska köra samma version av pluginet. Filen `.glotto-version` i
+teammappen anger vilken version teamet kör. Startkollen gör kontrollen och
+lämnar svaret i `version`.
 
 | Svar | Betyder | Gör |
 |---|---|---|
@@ -413,7 +587,7 @@ teammappen anger vilken version teamet kör.
 **Vid `gammal`:** säg det direkt - *"Ditt plugin är 0.17.0, teamet kör 0.19.1.
 Uppdatera: Customize → Plugins → Glotto assistent → ⋮ → Check for updates → Update."* Skills som bara
 läser (`status`, att visa journalen, att visa rapporten) fortsätter efter beskedet. Skills som
-skriver (`skapa`, `plocka-ut`, `publicera`, `utdata`, att skriva i journalen, att ta fram en ny rapport)
+skriver (`skapa`, `plocka-ut`, `publicera`, `utdata`, `team`, att skriva i journalen, att ta fram en ny rapport)
 **stannar** tills pluginet är uppdaterat - en gammal version följer gamla regler
 och skriver ändå till samma wiki som alla andra.
 

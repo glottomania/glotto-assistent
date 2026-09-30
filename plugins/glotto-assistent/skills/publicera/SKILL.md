@@ -7,7 +7,7 @@ description: Lägger upp ett dokument från verkstaden till teamets delade wiki 
 
 Läs `${CLAUDE_PLUGIN_ROOT}/GLOTTO.md` först - konfiguration, frontmatter-hantering och regler. Läs och skriv frontmatter med `las()` och `skriv()` därifrån, aldrig med `grep` eller `sed`.
 
-**Versionskontrollen först** - se avsnittet *Versionskontroll* i `GLOTTO.md`. Vid `gammal`: stanna.
+**Startkollen först** - se avsnitten *Startkoll* och *Versionskontroll* i `GLOTTO.md`. Vid versionen `gammal`: stanna.
 
 Denna skill täcker alla vägar från verkstaden till den delade. **Användaren ska inte behöva veta vilket fall som gäller** - ta reda på det.
 

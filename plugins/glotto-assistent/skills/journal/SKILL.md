@@ -7,7 +7,7 @@ description: Skriver i och läser ur systemets journal - vem som gjort vad och n
 
 Läs `${CLAUDE_PLUGIN_ROOT}/GLOTTO.md` först - avsnittet *Journal* beskriver format, handlingsord och regler. Skriv alltid med `journalfor()`, aldrig för hand.
 
-**Versionskontrollen först** - se avsnittet *Versionskontroll* i `GLOTTO.md`. Vid `gammal`: visa journalen efter beskedet, men skriv inget i den.
+**Startkollen först** - se avsnitten *Startkoll* och *Versionskontroll* i `GLOTTO.md`. Vid versionen `gammal`: visa journalen efter beskedet, men skriv inget i den.
 
 ## Skriva
 

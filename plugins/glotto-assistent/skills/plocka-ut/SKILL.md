@@ -7,7 +7,7 @@ description: Plockar ut ett dokument från teamets delade wiki för redigering, 
 
 Läs `${CLAUDE_PLUGIN_ROOT}/GLOTTO.md` först - konfiguration, frontmatter-hantering och regler. Läs och skriv frontmatter med `las()` och `skriv()` därifrån, aldrig med `grep` eller `sed`.
 
-**Versionskontrollen först** - se avsnittet *Versionskontroll* i `GLOTTO.md`. Vid `gammal`: stanna.
+**Startkollen först** - se avsnitten *Startkoll* och *Versionskontroll* i `GLOTTO.md`. Vid versionen `gammal`: stanna.
 
 Dokumentet **ligger kvar** i den delade wikin under tiden och uppdateras löpande - det tas aldrig bort därifrån. Det som skapas lokalt är en arbetskopia.
 

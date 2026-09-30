@@ -221,6 +221,25 @@ if ($team.lagring -eq 'dropbox') {
     }
 }
 
+# --- 8. Snabbåtkomst i Utforskaren ----------------------------------------------
+# Fäst projektmappen och teammappen, så att de alltid ligger ett klick bort.
+try {
+    $shell = New-Object -ComObject Shell.Application
+    $fasta = @($shell.Namespace('shell:::{679f85cb-0220-4080-b29b-5540cc05aab6}').Items() |
+        Where-Object { $_.ExtendedProperty('System.Home.IsPinned') -ne $false } | ForEach-Object { $_.Path })
+    $nya = @()
+    foreach ($m in @($projektmapp, $teammapp)) {
+        if ($fasta -notcontains $m) {
+            $shell.Namespace($m).Self.InvokeVerb('pintohome')
+            $nya += Split-Path $m -Leaf
+        }
+    }
+    if ($nya.Count) { Rad 'OK' 'Snabbåtkomst' ('fäst: ' + ($nya -join ', ')) }
+    else { Rad 'OK' 'Snabbåtkomst' 'projektmappen och teammappen är redan fästa' }
+} catch {
+    Rad 'Senare' 'Snabbåtkomst' 'kunde inte fästa mapparna - högerklicka på dem i Utforskaren och välj Fäst i Snabbåtkomst'
+}
+
 # --- Klart ---------------------------------------------------------------------
 Visa-Resultat
 Write-Host ''

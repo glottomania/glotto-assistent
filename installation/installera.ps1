@@ -227,9 +227,8 @@ Write-Host ''
 Write-Host 'Sedan, i Claude-appen:' -ForegroundColor Cyan
 Write-Host '  1. Customize > Plugins > + Add > "Add from a repository" > glottomania/glotto-assistent > Install'
 Write-Host ('  2. Starta en ny uppgift och anslut mappen {0}' -f $projektmapp)
-if ($team.google_grupp) {
-    Write-Host '  3. Koppla Google Drive under Connectors, med ditt jobbkonto'
-}
+Write-Host '  3a. Använder teamet Google: koppla Google Drive under Connectors, med ditt jobbkonto'
+Write-Host '  3b. Använder teamet Microsoft: koppla Microsoft 365 under Connectors, med ditt jobbkonto'
 Write-Host '  4. Säg "visa status" - Claude kontrollerar resten och säger till om något saknas'
 Write-Host ''
 Write-Host ('I Obsidian: öppna teammappen och {0} som två separata valv.' -f $projektmapp)

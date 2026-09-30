@@ -125,7 +125,7 @@ if ($hittade.Count -eq 1) {
 if (-not $teamfil) {
     Rad 'Fel' 'Teammapp' 'hittas inte. Be administratören dela teammappen med dig, vänta tills den synkat klart och kör skriptet igen.'
     Visa-Resultat
-    Read-Host 'Tryck Enter för att stänga'
+    Read-Host 'Läs listan ovan. Tryck Enter för att stänga när du är klar'
     return
 }
 
@@ -137,7 +137,7 @@ $hem = (Resolve-Path $HOME).Path.TrimEnd($Sep)
 if (-not $teammapp.StartsWith($hem + $Sep, [StringComparison]::OrdinalIgnoreCase)) {
     Rad 'Fel' 'Teammapp' 'ligger utanför din hemkatalog - flytta den dit (till exempel via Dropbox inställningar) och kör skriptet igen'
     Visa-Resultat
-    Read-Host 'Tryck Enter för att stänga'
+    Read-Host 'Läs listan ovan. Tryck Enter för att stänga när du är klar'
     return
 }
 $deladMapp = $teammapp.Substring($hem.Length + 1).Replace([string]$Sep, '/')
@@ -166,7 +166,7 @@ if (Test-Path $config) {
 if (-not $anvandare -or -not ($aktiva | Where-Object { $_.anvandare -eq $anvandare })) {
     Rad 'Fel' 'Medlem' 'du står inte bland teamets medlemmar. Be administratören lägga till dig och kör skriptet igen.'
     Visa-Resultat
-    Read-Host 'Tryck Enter för att stänga'
+    Read-Host 'Läs listan ovan. Tryck Enter för att stänga när du är klar'
     return
 }
 Rad 'OK' 'Medlem' $anvandare
@@ -234,5 +234,8 @@ Write-Host '  4. Säg "visa status" - Claude kontrollerar resten och säger till
 Write-Host ''
 Write-Host ('I Obsidian: öppna teammappen och {0} som två separata valv.' -f $projektmapp)
 Write-Host ''
-Read-Host 'Tryck Enter för att stänga'
+Write-Host 'Stäng inte fönstret än. Gör stegen ovan först - de står inte någon annanstans.' -ForegroundColor Yellow
+Write-Host 'Du kan alltid se dem igen genom att köra skriptet en gång till.' -ForegroundColor Yellow
+Write-Host ''
+Read-Host 'Tryck Enter för att stänga när du är klar'
 }
